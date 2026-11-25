@@ -334,3 +334,125 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
 - **Auth:** Admin
 - **Success (`200 OK`):** Returns deleted recruitment post.
 
+
+
+---
+
+## 6. Contacts (`/api/v1/contacts`)
+
+### `POST /api/v1/contacts`
+- **Auth:** Public (`Cache-Control: no-store`)
+- **Rate Limit:** Max **5 submissions per hour per IP** (returns `429 Too Many Requests` in standard error format).
+- **Content-Type:** `application/json`
+- **Honeypot:** Includes an optional hidden field `website`. If populated, the API returns `201 Created` (`data: null`) without saving anything to MongoDB. Unknown fields (e.g., `isRead`, `_id`, `role`) are stripped by Zod.
+- **Body:**
+```json
+{
+  "name": "Jane Doe",
+  "country": "United States",
+  "phone": "+1 (555) 123-4567",
+  "email": "jane@example.com",
+  "message": "Hello, we would like to discuss a potential project.",
+  "website": ""
+}
+```
+- **Success (`201 Created`):**
+```json
+{
+  "success": true,
+  "message": "Thank you for contacting us. We will get back to you soon.",
+  "data": {
+    "_id": "66f1a2b3c4d5e6f7a8b9c0d5",
+    "name": "Jane Doe",
+    "country": "United States",
+    "createdAt": "2026-11-25T10:00:00.000Z"
+  }
+}
+```
+- **Errors:** `400 Bad Request` (validation failure or NoSQL operator keys), `429 Too Many Requests` (rate limit exceeded).
+
+### `GET /api/v1/contacts`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Query Params:**
+  - `page` (default `1`, min `1`)
+  - `limit` (default `10`, min `1`, max `50`)
+  - `isRead` (optional: `true` | `false`)
+  - `search` (optional: case-insensitive search on `name` or `email`)
+- **Success (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "Contact submissions retrieved successfully",
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "totalPages": 1
+  },
+  "data": [
+    {
+      "_id": "66f1a2b3c4d5e6f7a8b9c0d5",
+      "name": "Jane Doe",
+      "country": "United States",
+      "phone": "+1 (555) 123-4567",
+      "email": "jane@example.com",
+      "message": "Hello, we would like to discuss a potential project.",
+      "isRead": false,
+      "createdAt": "2026-11-25T10:00:00.000Z",
+      "updatedAt": "2026-11-25T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `GET /api/v1/contacts/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (Mongo ObjectId)
+- **Success (`200 OK`):** Returns single contact submission.
+- **Errors:** `400` (invalid ID), `401`, `404` (not found).
+
+### `PATCH /api/v1/contacts/:id/read`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (Mongo ObjectId)
+- **Content-Type:** `application/json`
+- **Body:** `{ "isRead": true }` (optional; defaults to `true`)
+- **Success (`200 OK`):** Returns updated contact submission.
+
+### `DELETE /api/v1/contacts/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (Mongo ObjectId)
+- **Success (`200 OK`):** Returns deleted contact submission.
+
+---
+
+## 7. Admin Dashboard Stats (`/api/v1/admin/stats`)
+
+### `GET /api/v1/admin/stats`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Success (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "Admin dashboard stats retrieved successfully",
+  "data": {
+    "counts": {
+      "banners": 3,
+      "blogs": 12,
+      "recruitments": 4,
+      "contacts": 18,
+      "unreadContacts": 5
+    },
+    "recentContacts": [
+      {
+        "id": "66f1a2b3c4d5e6f7a8b9c0d5",
+        "name": "Jane Doe",
+        "email": "jane@example.com",
+        "country": "United States",
+        "createdAt": "2026-11-25T10:00:00.000Z",
+        "isRead": false
+      }
+    ]
+  }
+}
+```
+- **Error (`401 Unauthorized`):** Missing, invalid, or expired `accessToken` cookie.

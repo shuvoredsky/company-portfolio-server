@@ -2,7 +2,9 @@ import { Router } from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { BannerRoutes } from '../modules/banner/banner.route';
 import { BlogRoutes } from '../modules/blog/blog.route';
+import { ContactRoutes } from '../modules/contact/contact.route';
 import { RecruitmentRoutes } from '../modules/recruitment/recruitment.route';
+import { StatsRoutes } from '../modules/stats/stats.route';
 
 const router = Router();
 
@@ -27,6 +29,14 @@ const moduleRoutes: ModuleRoute[] = [
   {
     path: '/recruitments',
     route: RecruitmentRoutes,
+  },
+  {
+    path: '/contacts',
+    route: ContactRoutes,
+  },
+  {
+    path: '/admin',
+    route: StatsRoutes,
   },
 ];
 

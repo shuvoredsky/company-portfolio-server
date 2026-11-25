@@ -68,11 +68,15 @@ const globalErrorHandler: ErrorRequestHandler = (err: unknown, _req, res, _next)
       },
     ];
   } else if (err instanceof Error) {
-    message = err.message || 'Internal Server Error';
+    const safeMessage =
+      config.nodeEnv === 'production'
+        ? 'Internal Server Error'
+        : err.message || 'Internal Server Error';
+    message = safeMessage;
     errorSources = [
       {
         path: '',
-        message: err.message || 'Internal Server Error',
+        message: safeMessage,
       },
     ];
   }

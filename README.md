@@ -57,3 +57,36 @@ For the complete architecture, coding conventions, security design, and implemen
 - `src/app/utils/` — `catchAsync`, `sendResponse`
 - `src/app/routes/` — Central `/api/v1` router
 
+
+
+## Deployment
+
+### Required Environment Variables (Names Only)
+- `NODE_ENV` (`production`)
+- `PORT` (e.g., `5000` or platform-assigned)
+- `MONGODB_URI`
+- `JWT_SECRET` (minimum 32 characters in production)
+- `JWT_EXPIRES_IN` (e.g., `7d`)
+- `CLIENT_URL` (supports comma-separated origins for preview/staging domains)
+- `ADMIN_URL` (supports comma-separated origins for preview/staging domains)
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD` (minimum 8 characters in production)
+
+### Build & Start Commands
+- **Build command:** `npm run build`
+- **Start command:** `npm start`
+
+### Production Security Notes
+- **Cross-Origin Cookies & HTTPS:** In `production`, `accessToken` is issued with `httpOnly: true`, `secure: true`, and `sameSite: 'none'` so separate client/admin domains work. **HTTPS is strictly required** for browsers to accept `Secure; SameSite=None` cookies, and frontends must send `credentials: 'include'`.
+- **CORS Setup:** Set `CLIENT_URL` and `ADMIN_URL` to exact `https://...` origins (no trailing slash). Multiple origins can be comma-separated (e.g., `https://admin.example.com,https://admin-preview.vercel.app`).
+- **Trust Proxy:** `app.set('trust proxy', 1)` is automatically enabled in `production` so `express-rate-limit` reads the real client IP behind reverse proxies (Render, Railway, Cloudflare, Nginx).
+
+### Render / Railway Deployment Checklist
+1. Connect the `company-portfolio-server` GitHub repository (`main` branch).
+2. Set Build Command to `npm install && npm run build` and Start Command to `npm start`.
+3. Add all environment variables listed above (ensure `NODE_ENV=production`, `JWT_SECRET` >= 32 chars, `ADMIN_PASSWORD` >= 8 chars).
+4. Whitelist your hosting platform's outbound IPs (or `0.0.0.0/0` with strong DB credentials) in MongoDB Atlas Network Access.
+5. Verify `GET https://<your-api-domain>/api/v1/health` returns `"database": "connected"`.

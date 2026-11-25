@@ -212,13 +212,13 @@ Every module under `src/app/modules/<feature>/` must follow a strict 6-file sepa
 
 ## 9. Overall Project Roadmap
 
-### Backend Server (`company-server`) — 4 Prompts
-| Prompt | Scope | Key Deliverables |
-| --- | --- | --- |
-| **Prompt 1 (Current)** | **Foundation** | `package.json`, TypeScript strict config, env Zod validation, `AppError` + error handlers, `globalErrorHandler`, `notFound`, `validateRequest`, `catchAsync`, `sendResponse`, `app.ts`, `server.ts`, health check `/api/v1/health`, empty module scaffolding, `PLAN.md`, `README.md`, Git remote setup. |
-| **Prompt 2** | **Auth + Admin Seed + GitHub Push** | Admin model & interface, `bcryptjs` password hashing, admin seeding from env, `auth` module (`login`, `logout`, `me`), HTTP-only JWT cookie helper, `auth` verification middleware, login rate limiter, initial GitHub push. |
-| **Prompt 3** | **Cloudinary + Banner + Blog + Recruitment** | Cloudinary config + upload/destroy helpers, `multer` memory-storage upload middleware (size/MIME limits), `banner` CRUD module, `blog` CRUD module (with Cloudinary lifecycle cleanup), `recruitment` CRUD module. |
-| **Prompt 4** | **Contact + Security Hardening + Final Report** | `contact` submission & admin management module, contact rate limiter, public `Cache-Control` headers, Mongoose indexes, security hardening, and final verification report. |
+### Backend Server (`company-server`) — 4 Prompts (All Done)
+| Prompt | Scope | Status | Key Deliverables |
+| --- | --- | --- | --- |
+| **Prompt 1** | **Foundation** | Done | `package.json`, TypeScript strict config, env Zod validation, `AppError` + error handlers, `globalErrorHandler`, `notFound`, `validateRequest`, `catchAsync`, `sendResponse`, `app.ts`, `server.ts`, health check `/api/v1/health`, empty module scaffolding, `PLAN.md`, `README.md`, Git remote setup. |
+| **Prompt 2** | **Auth + Admin Seed + GitHub Push** | Done | Admin model & interface, `bcryptjs` password hashing, admin seeding from env, `auth` module (`login`, `logout`, `me`), HTTP-only JWT cookie helper, `auth` verification middleware, login rate limiter, `tsx` dev runner, initial GitHub push. |
+| **Prompt 3** | **Cloudinary + Banner + Blog + Recruitment** | Done | Cloudinary config + upload/destroy helpers, `multer` memory-storage upload middleware (size/MIME limits), `banner` CRUD module, `blog` CRUD module (with Cloudinary lifecycle cleanup), `recruitment` CRUD module, `API.md`. |
+| **Prompt 4** | **Contact + Security Hardening + Final Report** | Done | `contact` submission (with honeypot & rate limit) & admin management module, `GET /api/v1/admin/stats` dashboard module, NoSQL injection sanitizer, global API rate limiter, multi-origin CORS, production error sanitization, deployment docs. |
 
 ### Admin Frontend (`company-admin`, Next.js) — 4 Prompts
 - **4 Prompts** covering admin dashboard foundation & auth integration, Banner & Blog management (with image uploads), Recruitment management, and Contact submissions inbox + final polish.

@@ -4,6 +4,23 @@ import { z } from 'zod';
 
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
+const commaSeparatedUrlsSchema = (defaultUrl: string) =>
+  z
+    .string()
+    .default(defaultUrl)
+    .transform((raw) =>
+      raw
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    )
+    .refine(
+      (urls) =>
+        urls.length > 0 &&
+        urls.every((url) => z.string().url().safeParse(url).success),
+      'Must contain one or more valid comma-separated URLs',
+    );
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production']).default('development'),
@@ -11,8 +28,8 @@ const envSchema = z
     MONGODB_URI: z.string().optional().default(''),
     JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
     JWT_EXPIRES_IN: z.string().min(1).default('7d'),
-    CLIENT_URL: z.string().url().default('http://localhost:3000'),
-    ADMIN_URL: z.string().url().default('http://localhost:3001'),
+    CLIENT_URL: commaSeparatedUrlsSchema('http://localhost:3000'),
+    ADMIN_URL: commaSeparatedUrlsSchema('http://localhost:3001'),
     CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
     CLOUDINARY_API_KEY: z.string().optional().default(''),
     CLOUDINARY_API_SECRET: z.string().optional().default(''),
@@ -78,7 +95,6 @@ export function parseDurationToMs(duration: string): number {
   const match = /^(\d+)\s*(ms|s|m|h|d)?$/i.exec(trimmed);
 
   if (!match || !match[1]) {
-    // Default to 7 days if format is unrecognized
     return 7 * 24 * 60 * 60 * 1000;
   }
 
@@ -101,6 +117,10 @@ export function parseDurationToMs(duration: string): number {
   }
 }
 
+const allowedOrigins = Array.from(
+  new Set([...env.CLIENT_URL, ...env.ADMIN_URL]),
+);
+
 const config = {
   nodeEnv: env.NODE_ENV,
   port: env.PORT,
@@ -110,8 +130,9 @@ const config = {
     expiresIn: env.JWT_EXPIRES_IN,
   },
   cors: {
-    clientUrl: env.CLIENT_URL,
-    adminUrl: env.ADMIN_URL,
+    clientUrl: env.CLIENT_URL[0] ?? 'http://localhost:3000',
+    adminUrl: env.ADMIN_URL[0] ?? 'http://localhost:3001',
+    allowedOrigins,
   },
   cloudinary: {
     cloudName: env.CLOUDINARY_CLOUD_NAME,
