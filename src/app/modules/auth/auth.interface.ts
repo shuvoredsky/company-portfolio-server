@@ -40,3 +40,4 @@ export interface IAdminModel extends Model<IAdmin> {
     hashedPassword: string,
   ): Promise<boolean>;
 }
+

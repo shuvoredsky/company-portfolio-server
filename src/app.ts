@@ -14,6 +14,10 @@ import sendResponse from './app/utils/sendResponse';
 
 const app: Application = express();
 
+if (config.nodeEnv === 'production') {
+  app.set('trust proxy', 1);
+}
+
 const allowedOrigins = [config.cors.clientUrl, config.cors.adminUrl].filter(
   Boolean,
 );

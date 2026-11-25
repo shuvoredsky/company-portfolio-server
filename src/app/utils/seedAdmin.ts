@@ -40,3 +40,4 @@ const seedAdmin = async (): Promise<void> => {
 };
 
 export default seedAdmin;
+

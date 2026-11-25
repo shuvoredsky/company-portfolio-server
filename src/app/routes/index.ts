@@ -1,5 +1,8 @@
 import { Router } from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route';
+import { BannerRoutes } from '../modules/banner/banner.route';
+import { BlogRoutes } from '../modules/blog/blog.route';
+import { RecruitmentRoutes } from '../modules/recruitment/recruitment.route';
 
 const router = Router();
 
@@ -8,12 +11,22 @@ interface ModuleRoute {
   route: Router;
 }
 
-// Feature module routes registered here:
-// /auth, /banners, /blogs, /recruitments, /contacts
 const moduleRoutes: ModuleRoute[] = [
   {
     path: '/auth',
     route: AuthRoutes,
+  },
+  {
+    path: '/banners',
+    route: BannerRoutes,
+  },
+  {
+    path: '/blogs',
+    route: BlogRoutes,
+  },
+  {
+    path: '/recruitments',
+    route: RecruitmentRoutes,
   },
 ];
 

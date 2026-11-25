@@ -51,3 +51,4 @@ adminSchema.statics.isPasswordMatched = async function (
 };
 
 export const Admin = model<IAdmin, IAdminModel>('Admin', adminSchema);
+

@@ -71,3 +71,4 @@ const auth = (...requiredRoles: TUserRole[]): RequestHandler => {
 };
 
 export default auth;
+

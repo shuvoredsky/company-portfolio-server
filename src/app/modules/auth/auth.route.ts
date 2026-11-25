@@ -40,3 +40,4 @@ router.post('/logout', AuthController.logout);
 router.get('/me', auth('admin'), AuthController.getMe);
 
 export const AuthRoutes = router;
+
