@@ -118,3 +118,4 @@ export const ContactService = {
   updateContactReadStatus,
   deleteContact,
 };
+

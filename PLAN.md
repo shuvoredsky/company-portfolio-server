@@ -127,19 +127,21 @@ Every module under `src/app/modules/<feature>/` must follow a strict 6-file sepa
   - `GET /api/v1/auth/me` — Protected (admin only). Returns current authenticated admin profile.
 
 ### 5.2 Banner (`/api/v1/banners`)
-- **Fields:** Dynamic banner data (e.g., `title`, `subtitle`, `ctaText`, `ctaLink`, `image: { url, publicId }`, `isActive`, `order`).
+- **Fields:** Image-only banner (`image: { url, publicId }`, `order`, `isActive`, timestamps). The client frontend displays banner images only (no text or CTA button overlay).
 - **Endpoints:**
-  - `GET /api/v1/banners` — Public. Lists active/all banners (supports pagination/filtering).
-  - `GET /api/v1/banners/:id` — Public. Fetch single banner by ID.
+  - `GET /api/v1/banners` — Public. Lists active banners (`_id`, `image.url`, `order`), sorted by `order` ascending.
+  - `GET /api/v1/banners/admin/all` — Admin only (`no-store`). Lists all banners.
   - `POST /api/v1/banners` — Admin only. Upload banner image to Cloudinary and create banner.
-  - `PATCH /api/v1/banners/:id` — Admin only. Update banner fields; if image is replaced, delete previous image from Cloudinary.
+  - `PATCH /api/v1/banners/:id` — Admin only. Update banner `order`/`isActive` or replace image (deletes previous image from Cloudinary).
   - `DELETE /api/v1/banners/:id` — Admin only. Delete banner and remove its image from Cloudinary.
 
 ### 5.3 Blog (`/api/v1/blogs`)
 - **Fields:** `title`, `description`, `image: { url, publicId }`, timestamps.
 - **Endpoints:**
-  - `GET /api/v1/blogs` — Public. Paginated list of blog posts (`page`, `limit`).
-  - `GET /api/v1/blogs/:id` — Public. Get single blog post by ID.
+  - `GET /api/v1/blogs` — Public (`public` cache). Paginated list of blog posts (`page`, `limit`, `search`).
+  - `GET /api/v1/blogs/admin/all` — Admin only (`no-store`). Paginated list with `search` for admin dashboard.
+  - `GET /api/v1/blogs/admin/:id` — Admin only (`no-store`). Get single blog post by ID for admin editing.
+  - `GET /api/v1/blogs/:id` — Public (`public` cache). Get single blog post by ID.
   - `POST /api/v1/blogs` — Admin only. Upload blog image to Cloudinary and create post.
   - `PATCH /api/v1/blogs/:id` — Admin only. Update blog post; delete old Cloudinary image if replaced.
   - `DELETE /api/v1/blogs/:id` — Admin only. Delete blog post and remove its image from Cloudinary.

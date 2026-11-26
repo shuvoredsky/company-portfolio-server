@@ -142,11 +142,11 @@ Base URL: `http://localhost:5000/api/v1` (replace host in production).
 
 ## 3. Banners (`/api/v1/banners`)
 
-Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
+Banners are **image-only** (no title, subtitle, or CTA text overlay on the client frontend). Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`. Unknown fields sent in requests are stripped by Zod.
 
 ### `GET /api/v1/banners`
 - **Auth:** Public (`Cache-Control: public, max-age=60, stale-while-revalidate=300`)
-- **Behavior:** Returns only active banners (`isActive: true`), sorted by `order` ascending.
+- **Behavior:** Returns only active banners (`isActive: true`), sorted by `order` ascending, selecting only `_id`, `image.url`, and `order`.
 - **Success (`200 OK`):**
 ```json
 {
@@ -155,14 +155,30 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
   "data": [
     {
       "_id": "66f1a2b3c4d5e6f7a8b9c0d2",
-      "title": "Building the Future",
-      "subtitle": "Enterprise software solutions",
+      "image": {
+        "url": "https://res.cloudinary.com/.../banner.webp"
+      },
+      "order": 1
+    }
+  ]
+}
+```
+
+### `GET /api/v1/banners/admin/all`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Behavior:** Returns all banners (active and inactive), sorted by `order` ascending, including `image.publicId`, `isActive`, and timestamps.
+- **Success (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "All banners retrieved successfully",
+  "data": [
+    {
+      "_id": "66f1a2b3c4d5e6f7a8b9c0d2",
       "image": {
         "url": "https://res.cloudinary.com/.../banner.webp",
         "publicId": "company-portfolio/banners/abc123"
       },
-      "ctaText": "Contact Us",
-      "ctaLink": "/contact",
       "order": 1,
       "isActive": true,
       "createdAt": "2026-11-25T10:00:00.000Z",
@@ -172,35 +188,26 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
 }
 ```
 
-### `GET /api/v1/banners/admin/all`
-- **Auth:** Admin (`Cache-Control: no-store`)
-- **Behavior:** Returns all banners (active and inactive), sorted by `order` ascending.
-- **Success (`200 OK`):** Same item shape as `GET /api/v1/banners`.
-
 ### `POST /api/v1/banners`
-- **Auth:** Admin
+- **Auth:** Admin (`Cache-Control: no-store`)
 - **Content-Type:** `multipart/form-data`
 - **Fields:**
   - `image` (file, **required**): JPEG/PNG/WebP, max 5MB
-  - `title` (string, **required**, max 200)
-  - `subtitle` (string, optional, max 500)
-  - `ctaText` (string, optional, max 100)
-  - `ctaLink` (string, optional, max 500)
   - `order` (integer string, optional, default `0`)
   - `isActive` (`"true"` | `"false"`, optional, default `true`)
 - **Success (`201 Created`):** Returns created banner object.
 - **Errors:** `400` (missing/invalid image or fields), `401` (unauthenticated), `503` (Cloudinary not configured).
 
 ### `PATCH /api/v1/banners/:id`
-- **Auth:** Admin
+- **Auth:** Admin (`Cache-Control: no-store`)
 - **Content-Type:** `multipart/form-data`
 - **Params:** `id` (24-char hex Mongo ObjectId)
-- **Fields:** All fields optional (`image` optional; if provided, replaces old Cloudinary image).
+- **Fields:** `image` (optional; if provided, replaces old Cloudinary image), `order` (optional), `isActive` (optional).
 - **Success (`200 OK`):** Returns updated banner object.
 - **Errors:** `400` (invalid ID/fields/file), `401`, `404` (banner not found).
 
 ### `DELETE /api/v1/banners/:id`
-- **Auth:** Admin
+- **Auth:** Admin (`Cache-Control: no-store`)
 - **Params:** `id` (24-char hex Mongo ObjectId)
 - **Behavior:** Deletes banner from MongoDB and removes its image from Cloudinary.
 - **Success (`200 OK`):** Returns deleted banner object.
@@ -244,6 +251,16 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
   ]
 }
 ```
+
+### `GET /api/v1/blogs/admin/all`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Query Params:** Same `page`, `limit`, and `search` as `GET /api/v1/blogs`. Used by the admin dashboard so newly created/edited/deleted blogs appear immediately without browser caching.
+- **Success (`200 OK`):** Same paginated response shape as `GET /api/v1/blogs`.
+
+### `GET /api/v1/blogs/admin/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (Mongo ObjectId)
+- **Success (`200 OK`):** Returns single blog object without caching.
 
 ### `GET /api/v1/blogs/:id`
 - **Auth:** Public

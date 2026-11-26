@@ -16,6 +16,22 @@ router.get(
 );
 
 router.get(
+  '/admin/all',
+  noStoreCache,
+  auth('admin'),
+  validateRequest(BlogValidation.listBlogsQuerySchema),
+  BlogController.getAllBlogs,
+);
+
+router.get(
+  '/admin/:id',
+  noStoreCache,
+  auth('admin'),
+  validateRequest(BlogValidation.blogIdParamSchema),
+  BlogController.getBlogById,
+);
+
+router.get(
   '/:id',
   publicCache,
   validateRequest(BlogValidation.blogIdParamSchema),
@@ -49,4 +65,3 @@ router.delete(
 );
 
 export const BlogRoutes = router;
-

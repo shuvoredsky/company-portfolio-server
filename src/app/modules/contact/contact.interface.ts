@@ -24,3 +24,4 @@ export interface IContactListQuery {
   isRead?: boolean;
   search?: string;
 }
+

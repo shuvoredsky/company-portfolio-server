@@ -50,3 +50,4 @@ contactSchema.index({ createdAt: -1 });
 contactSchema.index({ isRead: 1 });
 
 export const Contact = model<IContact>('Contact', contactSchema);
+

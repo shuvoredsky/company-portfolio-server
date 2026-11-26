@@ -8,3 +8,4 @@ const router = Router();
 router.get('/stats', noStoreCache, auth('admin'), StatsController.getAdminStats);
 
 export const StatsRoutes = router;
+

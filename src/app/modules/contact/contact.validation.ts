@@ -72,3 +72,4 @@ export const ContactValidation = {
   contactIdParamSchema,
   markReadSchema,
 };
+

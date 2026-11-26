@@ -18,3 +18,4 @@ const getAdminStats = catchAsync(async (_req: Request, res: Response) => {
 export const StatsController = {
   getAdminStats,
 };
+

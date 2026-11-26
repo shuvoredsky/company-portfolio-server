@@ -14,32 +14,24 @@ const booleanFromMultipart = z.preprocess((val) => {
 }, z.boolean());
 
 const createBannerSchema = z.object({
-  body: z.object({
-    title: z
-      .string()
-      .trim()
-      .min(1, 'Title is required')
-      .max(200, 'Title must not exceed 200 characters'),
-    subtitle: z.string().trim().max(500).optional(),
-    ctaText: z.string().trim().max(100).optional(),
-    ctaLink: z.string().trim().max(500).optional(),
-    order: z.coerce.number().int().default(0),
-    isActive: booleanFromMultipart.optional().default(true),
-  }),
+  body: z
+    .object({
+      order: z.coerce.number().int().default(0),
+      isActive: booleanFromMultipart.optional().default(true),
+    })
+    .default({ order: 0, isActive: true }),
 });
 
 const updateBannerSchema = z.object({
   params: z.object({
     id: objectIdSchema,
   }),
-  body: z.object({
-    title: z.string().trim().min(1).max(200).optional(),
-    subtitle: z.string().trim().max(500).optional(),
-    ctaText: z.string().trim().max(100).optional(),
-    ctaLink: z.string().trim().max(500).optional(),
-    order: z.coerce.number().int().optional(),
-    isActive: booleanFromMultipart.optional(),
-  }),
+  body: z
+    .object({
+      order: z.coerce.number().int().optional(),
+      isActive: booleanFromMultipart.optional(),
+    })
+    .default({}),
 });
 
 const bannerIdParamSchema = z.object({
@@ -53,4 +45,3 @@ export const BannerValidation = {
   updateBannerSchema,
   bannerIdParamSchema,
 };
-

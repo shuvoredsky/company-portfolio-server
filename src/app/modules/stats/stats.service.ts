@@ -51,3 +51,4 @@ const getAdminStats = async (): Promise<IAdminStatsResponse> => {
 export const StatsService = {
   getAdminStats,
 };
+

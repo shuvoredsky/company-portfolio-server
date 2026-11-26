@@ -9,19 +9,19 @@ import {
 import { Banner } from './banner.model';
 
 const BANNER_FOLDER = 'company-portfolio/banners';
-const BANNER_PROJECTION =
-  'title subtitle image ctaText ctaLink order isActive createdAt updatedAt';
+const PUBLIC_BANNER_PROJECTION = '_id image.url order';
+const ADMIN_BANNER_PROJECTION = '_id image order isActive createdAt updatedAt';
 
 const getActiveBanners = async () => {
   return Banner.find({ isActive: true })
-    .select(BANNER_PROJECTION)
+    .select(PUBLIC_BANNER_PROJECTION)
     .sort({ order: 1, createdAt: -1 })
     .lean();
 };
 
 const getAllBannersAdmin = async () => {
   return Banner.find()
-    .select(BANNER_PROJECTION)
+    .select(ADMIN_BANNER_PROJECTION)
     .sort({ order: 1, createdAt: -1 })
     .lean();
 };
@@ -38,10 +38,18 @@ const createBanner = async (
 
   try {
     const created = await Banner.create({
-      ...payload,
+      order: payload.order ?? 0,
+      isActive: payload.isActive ?? true,
       image: uploadedImage,
     });
-    return created.toObject();
+    return {
+      _id: created._id,
+      image: created.image,
+      order: created.order,
+      isActive: created.isActive,
+      createdAt: created.createdAt,
+      updatedAt: created.updatedAt,
+    };
   } catch (error: unknown) {
     await deleteImage(uploadedImage.publicId);
     throw error;
@@ -53,13 +61,22 @@ const updateBanner = async (
   payload: IUpdateBannerPayload,
   file?: Express.Multer.File,
 ) => {
-  const existing = await Banner.findById(id).select(BANNER_PROJECTION).lean();
+  const existing = await Banner.findById(id)
+    .select(ADMIN_BANNER_PROJECTION)
+    .lean();
 
   if (!existing) {
     throw new AppError(status.NOT_FOUND, 'Banner not found');
   }
 
-  const updateData: Partial<IBanner> = { ...payload };
+  const updateData: Partial<IBanner> = {};
+  if (payload.order !== undefined) {
+    updateData.order = payload.order;
+  }
+  if (payload.isActive !== undefined) {
+    updateData.isActive = payload.isActive;
+  }
+
   let newUploadedPublicId: string | undefined;
 
   if (file) {
@@ -73,7 +90,7 @@ const updateBanner = async (
       new: true,
       runValidators: true,
     })
-      .select(BANNER_PROJECTION)
+      .select(ADMIN_BANNER_PROJECTION)
       .lean();
 
     if (!updated) {
@@ -98,7 +115,7 @@ const updateBanner = async (
 
 const deleteBanner = async (id: string) => {
   const deleted = await Banner.findByIdAndDelete(id)
-    .select(BANNER_PROJECTION)
+    .select(ADMIN_BANNER_PROJECTION)
     .lean();
 
   if (!deleted) {
@@ -116,4 +133,3 @@ export const BannerService = {
   updateBanner,
   deleteBanner,
 };
-
