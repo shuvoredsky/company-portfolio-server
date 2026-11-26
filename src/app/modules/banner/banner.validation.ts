@@ -13,10 +13,42 @@ const booleanFromMultipart = z.preprocess((val) => {
   return val;
 }, z.boolean());
 
+const preprocessOrderInput = (val: unknown): unknown => {
+  if (val === '' || val === undefined || val === null) {
+    return undefined;
+  }
+  if (typeof val === 'number') {
+    return val;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return undefined;
+    return Number(trimmed);
+  }
+  return val;
+};
+
+const baseOrderNumber = z
+  .number({ message: 'Order must be a valid number' })
+  .refine((n) => Number.isFinite(n), 'Order must be a valid number')
+  .int('Order must be a whole number')
+  .min(0, 'Order must be 0 or greater')
+  .max(9999, 'Order must not exceed 9999');
+
+const createOrderSchema = z.preprocess(
+  preprocessOrderInput,
+  baseOrderNumber.optional().default(0),
+);
+
+const updateOrderSchema = z.preprocess(
+  preprocessOrderInput,
+  baseOrderNumber.optional(),
+);
+
 const createBannerSchema = z.object({
   body: z
     .object({
-      order: z.coerce.number().int().default(0),
+      order: createOrderSchema,
       isActive: booleanFromMultipart.optional().default(true),
     })
     .default({ order: 0, isActive: true }),
@@ -28,7 +60,7 @@ const updateBannerSchema = z.object({
   }),
   body: z
     .object({
-      order: z.coerce.number().int().optional(),
+      order: updateOrderSchema,
       isActive: booleanFromMultipart.optional(),
     })
     .default({}),
