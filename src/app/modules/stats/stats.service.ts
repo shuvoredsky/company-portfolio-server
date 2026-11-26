@@ -1,6 +1,7 @@
 import { Banner } from '../banner/banner.model';
 import { Blog } from '../blog/blog.model';
 import { Contact } from '../contact/contact.model';
+import { Network } from '../network/network.model';
 import { Recruitment } from '../recruitment/recruitment.model';
 import { IAdminStatsResponse, IRecentContactItem } from './stats.interface';
 
@@ -8,6 +9,7 @@ const getAdminStats = async (): Promise<IAdminStatsResponse> => {
   const [
     banners,
     blogs,
+    networks,
     recruitments,
     contacts,
     unreadContacts,
@@ -15,6 +17,7 @@ const getAdminStats = async (): Promise<IAdminStatsResponse> => {
   ] = await Promise.all([
     Banner.countDocuments(),
     Blog.countDocuments(),
+    Network.countDocuments(),
     Recruitment.countDocuments(),
     Contact.countDocuments(),
     Contact.countDocuments({ isRead: false }),
@@ -40,6 +43,7 @@ const getAdminStats = async (): Promise<IAdminStatsResponse> => {
     counts: {
       banners,
       blogs,
+      networks,
       recruitments,
       contacts,
       unreadContacts,
@@ -51,4 +55,3 @@ const getAdminStats = async (): Promise<IAdminStatsResponse> => {
 export const StatsService = {
   getAdminStats,
 };
-

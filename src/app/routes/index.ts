@@ -3,6 +3,7 @@ import { AuthRoutes } from '../modules/auth/auth.route';
 import { BannerRoutes } from '../modules/banner/banner.route';
 import { BlogRoutes } from '../modules/blog/blog.route';
 import { ContactRoutes } from '../modules/contact/contact.route';
+import { NetworkRoutes } from '../modules/network/network.route';
 import { RecruitmentRoutes } from '../modules/recruitment/recruitment.route';
 import { StatsRoutes } from '../modules/stats/stats.route';
 
@@ -25,6 +26,10 @@ const moduleRoutes: ModuleRoute[] = [
   {
     path: '/blogs',
     route: BlogRoutes,
+  },
+  {
+    path: '/networks',
+    route: NetworkRoutes,
   },
   {
     path: '/recruitments',

@@ -11,6 +11,7 @@ export interface IAdminStatsResponse {
   counts: {
     banners: number;
     blogs: number;
+    networks: number;
     recruitments: number;
     contacts: number;
     unreadContacts: number;

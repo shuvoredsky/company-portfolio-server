@@ -146,7 +146,16 @@ Every module under `src/app/modules/<feature>/` must follow a strict 6-file sepa
   - `PATCH /api/v1/blogs/:id` — Admin only. Update blog post; delete old Cloudinary image if replaced.
   - `DELETE /api/v1/blogs/:id` — Admin only. Delete blog post and remove its image from Cloudinary.
 
-### 5.4 Recruitment (`/api/v1/recruitments`)
+### 5.4 Network (`/api/v1/networks`)
+- **Fields:** `title` (max 200), `description` (10–5000 chars), `image: { url, publicId }` (Cloudinary folder `company-portfolio/networks`), `externalUrl` (optional `http`/`https` URL, max 500), timestamps.
+- **Endpoints:**
+  - `GET /api/v1/networks` — Public (`public` cache). Paginated list (`page`, `limit`, `search`).
+  - `GET /api/v1/networks/admin/all` — Admin only (`no-store`). Paginated list with `search`.
+  - `GET /api/v1/networks/admin/:id` — Admin only (`no-store`). Single item for admin.
+  - `GET /api/v1/networks/:id` — Public (`public` cache). Single item by ID.
+  - `POST /api/v1/networks`, `PATCH /api/v1/networks/:id`, `DELETE /api/v1/networks/:id` — Admin only with Cloudinary lifecycle cleanup.
+
+### 5.5 Recruitment (`/api/v1/recruitments`)
 - **Fields:** `title`, `description`, timestamps (and optional status/active flag if needed).
 - **Endpoints:**
   - `GET /api/v1/recruitments` — Public. Paginated list of recruitment openings.

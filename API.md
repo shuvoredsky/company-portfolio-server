@@ -455,6 +455,7 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
     "counts": {
       "banners": 3,
       "blogs": 12,
+      "networks": 4,
       "recruitments": 4,
       "contacts": 18,
       "unreadContacts": 5
@@ -473,3 +474,72 @@ Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image`.
 }
 ```
 - **Error (`401 Unauthorized`):** Missing, invalid, or expired `accessToken` cookie.
+
+
+---
+
+## 8. Networks (`/api/v1/networks`)
+
+Partner organizations / networks the company works with. Images accept **JPEG, PNG, or WebP** up to **5 MB** under field name `image` (stored in Cloudinary folder `company-portfolio/networks`).
+- `externalUrl` is optional (max 500 chars) and **must** use `http://` or `https://` protocol only (`javascript:`, `data:`, `ftp:`, and malformed URLs return `400`). Sending an empty string `""` on `POST` omits the field; sending `""` on `PATCH` clears any existing `externalUrl`.
+
+### `GET /api/v1/networks`
+- **Auth:** Public (`Cache-Control: public, max-age=60, stale-while-revalidate=300`)
+- **Query Params:** `page` (default `1`, min `1`), `limit` (default `10`, min `1`, max `50`), `search` (optional case-insensitive title search)
+- **Success (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "Networks retrieved successfully",
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 1,
+    "totalPages": 1
+  },
+  "data": [
+    {
+      "_id": "66f1a2b3c4d5e6f7a8b9c0d6",
+      "title": "The Confagricoltura Network",
+      "description": "Agricultural association partner...",
+      "image": {
+        "url": "https://res.cloudinary.com/.../network.webp",
+        "publicId": "company-portfolio/networks/net123"
+      },
+      "externalUrl": "https://www.confagricoltura.it",
+      "createdAt": "2026-11-26T10:00:00.000Z",
+      "updatedAt": "2026-11-26T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+### `GET /api/v1/networks/admin/all`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Query Params:** Same `page`, `limit`, and `search` as `GET /api/v1/networks`.
+
+### `GET /api/v1/networks/admin/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (Mongo ObjectId)
+
+### `GET /api/v1/networks/:id`
+- **Auth:** Public (`Cache-Control: public, max-age=60, stale-while-revalidate=300`)
+- **Params:** `id` (Mongo ObjectId)
+- **Errors:** `400` (invalid ID), `404` (network item not found).
+
+### `POST /api/v1/networks`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Content-Type:** `multipart/form-data`
+- **Fields:** `image` (file, **required**), `title` (string, **required**, max 200), `description` (string, **required**, 10–5000 chars), `externalUrl` (optional `http`/`https` URL, max 500).
+- **Success (`201 Created`):** Returns created network item.
+
+### `PATCH /api/v1/networks/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Content-Type:** `multipart/form-data`
+- **Fields:** `title`, `description`, `externalUrl` (send `""` to clear), `image` (optional; replacing `image` deletes old Cloudinary asset).
+- **Success (`200 OK`):** Returns updated network item.
+
+### `DELETE /api/v1/networks/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Behavior:** Deletes network item from MongoDB and removes its image from Cloudinary.
+- **Success (`200 OK`):** Returns deleted network item.
