@@ -52,6 +52,7 @@ export interface IPublicApplicationCheckResult {
   serialNumber: string;
   status: TApplicationStatus;
   maskedName: string;
+  note: string | null;
   updatedAt: Date;
 }
 

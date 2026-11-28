@@ -12,7 +12,7 @@ import { Application } from './application.model';
 
 const ADMIN_PROJECTION =
   'serialNumber name email phone note passportNumber visaStatus status createdAt updatedAt';
-const PUBLIC_CHECK_PROJECTION = 'serialNumber status name updatedAt -_id';
+const PUBLIC_CHECK_PROJECTION = 'serialNumber status name note updatedAt -_id';
 
 const DUPLICATE_SERIAL_MESSAGE = 'This serial number already exists';
 
@@ -253,6 +253,7 @@ const checkApplicationStatusPublic = async (
     serialNumber: application.serialNumber,
     status: application.status,
     maskedName: maskApplicantName(application.name),
+    note: application.note ?? null,
     updatedAt: application.updatedAt ?? new Date(),
   };
 };

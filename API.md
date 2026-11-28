@@ -562,7 +562,7 @@ Tracks job applications submitted via email outside the system. Admins create re
 - **Auth:** Public (`Cache-Control: no-store`)
 - **Rate Limit:** Max **15 checks per 15 minutes per IP** (returns `429 Too Many Requests` in standard error shape), in addition to the global limiter. Uses `POST` so serial numbers never appear in URLs or access logs.
 - **Body:** `{ "serialNumber": "APP-7K9M2P4X" }` (trimmed and uppercased before validation).
-- **Privacy Rule:** Uses a strict projection and returns **only** `{ serialNumber, status, maskedName, updatedAt }`. `maskedName` keeps the first 2 characters of each word followed by `***` (for 1–2 char words, keeps the first character + `***`; e.g., `"Shuvo Kumar"` → `"Sh*** Ku***"`). Never returns `email`, `phone`, `passportNumber`, `visaStatus`, `note`, `_id`, or `createdAt`.
+- **Privacy Rule:** Uses a strict projection and returns **only** `{ serialNumber, status, maskedName, note, updatedAt }` (`note` is `null` when not set). `maskedName` keeps the first 2 characters of each word followed by `***` (for 1–2 char words, keeps the first character + `***`; e.g., `"Shuvo Kumar"` → `"Sh*** Ku***"`). Because `note` is publicly visible to anyone who knows the serial number, admins must not put personal or sensitive details in `note`. Never returns `email`, `phone`, `passportNumber`, `visaStatus`, `_id`, or `createdAt`.
 - **Success (`200 OK`):**
 ```json
 {
@@ -572,6 +572,7 @@ Tracks job applications submitted via email outside the system. Admins create re
     "serialNumber": "APP-7K9M2P4X",
     "status": "pending",
     "maskedName": "Sh*** Ku***",
+    "note": "Please wait for our HR team to contact you for the next step.",
     "updatedAt": "2026-11-28T10:00:00.000Z"
   }
 }
