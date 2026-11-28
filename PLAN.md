@@ -164,7 +164,13 @@ Every module under `src/app/modules/<feature>/` must follow a strict 6-file sepa
   - `PATCH /api/v1/recruitments/:id` — Admin only. Update recruitment post.
   - `DELETE /api/v1/recruitments/:id` — Admin only. Delete recruitment post.
 
-### 5.5 Contact (`/api/v1/contacts`)
+### 5.6 Application (`/api/v1/applications`)
+- **Fields:** `serialNumber` (unique uppercase 5–30 chars), `name`, `email`, `phone`, `status` (`pending` | `approved` | `rejected`), optional `note`, `passportNumber`, `visaStatus`, timestamps.
+- **Endpoints:**
+  - `POST /api/v1/applications/check` — Public (`no-store`, dedicated rate limiter: 15/15m per IP). Strict projection returning only `{ serialNumber, status, maskedName, updatedAt }`.
+  - `GET /api/v1/applications/admin/all`, `GET /api/v1/applications/admin/:id`, `POST /api/v1/applications`, `PATCH /api/v1/applications/:id`, `DELETE /api/v1/applications/:id` — Admin only (`no-store`).
+
+### 5.7 Contact (`/api/v1/contacts`)
 - **Fields:** `name`, `country`, `phone`, `email`, `message`, `isRead` (default `false`), timestamps.
 - **Endpoints:**
   - `POST /api/v1/contacts` — Public (rate-limited). Submit a contact inquiry.

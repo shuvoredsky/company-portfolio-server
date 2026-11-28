@@ -543,3 +543,65 @@ Partner organizations / networks the company works with. Images accept **JPEG, P
 - **Auth:** Admin (`Cache-Control: no-store`)
 - **Behavior:** Deletes network item from MongoDB and removes its image from Cloudinary.
 - **Success (`200 OK`):** Returns deleted network item.
+
+---
+
+## 9. Applications (`/api/v1/applications`)
+
+Tracks job applications submitted via email outside the system. Admins create records with a unique `serialNumber` and share it with applicants; applicants can check their status publicly without authentication.
+
+- **Fields:**
+  - `serialNumber`: required, unique, trimmed, stored UPPERCASE, 5–30 chars matching `/^[A-Z0-9][A-Z0-9-]{4,29}$/`.
+  - `name`: required, trimmed, 2–100 chars.
+  - `email`: required, lowercase, valid email, max 254 chars.
+  - `phone`: required, trimmed, 6–20 chars, digits/spaces/`+`/`-`/`()`.
+  - `status`: `"pending"` | `"approved"` | `"rejected"` (default `"pending"`).
+  - `note` (optional, max 1000), `passportNumber` (optional, max 30, letters/digits/spaces/hyphens), `visaStatus` (optional, max 100). Sending `""` on `POST` omits the field; sending `""` on `PATCH` clears it via `$unset`.
+
+### `POST /api/v1/applications/check`
+- **Auth:** Public (`Cache-Control: no-store`)
+- **Rate Limit:** Max **15 checks per 15 minutes per IP** (returns `429 Too Many Requests` in standard error shape), in addition to the global limiter. Uses `POST` so serial numbers never appear in URLs or access logs.
+- **Body:** `{ "serialNumber": "APP-7K9M2P4X" }` (trimmed and uppercased before validation).
+- **Privacy Rule:** Uses a strict projection and returns **only** `{ serialNumber, status, maskedName, updatedAt }`. `maskedName` keeps the first 2 characters of each word followed by `***` (for 1–2 char words, keeps the first character + `***`; e.g., `"Shuvo Kumar"` → `"Sh*** Ku***"`). Never returns `email`, `phone`, `passportNumber`, `visaStatus`, `note`, `_id`, or `createdAt`.
+- **Success (`200 OK`):**
+```json
+{
+  "success": true,
+  "message": "Application status retrieved successfully",
+  "data": {
+    "serialNumber": "APP-7K9M2P4X",
+    "status": "pending",
+    "maskedName": "Sh*** Ku***",
+    "updatedAt": "2026-11-28T10:00:00.000Z"
+  }
+}
+```
+- **Errors:** `400` (malformed serial number or NoSQL operator keys), `404` (`"No application found for this serial number"`), `429` (rate limit exceeded).
+
+### `GET /api/v1/applications/admin/all`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Query Params:** `page` (default `1`), `limit` (default `10`, max `50`), `status` (optional: `pending` | `approved` | `rejected`), `search` (optional case-insensitive escaped regex across `serialNumber`, `name`, `email`, `phone`). Sorted newest first (`createdAt: -1`).
+- **Success (`200 OK`):** Standard paginated response with `meta` and full admin application fields.
+
+### `GET /api/v1/applications/admin/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Params:** `id` (24-char hex Mongo ObjectId)
+- **Errors:** `400` (invalid ID), `401`, `404` (not found).
+
+### `POST /api/v1/applications`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Content-Type:** `application/json`
+- **Success (`201 Created`):** Returns created application.
+- **Errors:** `400` (validation failure), `401`, `409` (`"This serial number already exists"`).
+
+### `PATCH /api/v1/applications/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Content-Type:** `application/json`
+- **Body:** Any subset of application fields (`""` clears optional `note`, `passportNumber`, or `visaStatus`).
+- **Success (`200 OK`):** Returns updated application.
+- **Errors:** `400`, `401`, `404`, `409` (duplicate `serialNumber`).
+
+### `DELETE /api/v1/applications/:id`
+- **Auth:** Admin (`Cache-Control: no-store`)
+- **Success (`200 OK`):** Returns deleted application.
+- **Errors:** `400`, `401`, `404`.

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { ApplicationRoutes } from '../modules/application/application.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { BannerRoutes } from '../modules/banner/banner.route';
 import { BlogRoutes } from '../modules/blog/blog.route';
@@ -34,6 +35,10 @@ const moduleRoutes: ModuleRoute[] = [
   {
     path: '/recruitments',
     route: RecruitmentRoutes,
+  },
+  {
+    path: '/applications',
+    route: ApplicationRoutes,
   },
   {
     path: '/contacts',
